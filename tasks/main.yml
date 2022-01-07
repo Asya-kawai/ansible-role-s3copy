@@ -1,0 +1,103 @@
+- name: Update OS package caches for Debian
+  apt:
+    update_cache: yes
+  when: ansible_facts['os_family'] == 'Debian'
+  tags:
+    - s3copy
+    - webserver
+
+- name: Update OS package caches for CentOS
+  dnf:
+    update_cache: yes
+  when: ansible_facts['os_family'] == 'RedHat'
+  tags:
+    - s3copy
+    - webserver
+
+- name: Update OS packages
+  package:
+    name: '*'
+    state: latest
+  tags:
+    - s3copy
+    - webserver
+
+- name: Install OS packages
+  package:
+    name:
+      - zip
+      - unzip
+    state: present
+  tags:
+    - s3copy
+    - webserver
+
+- name: Check AWS cli exists
+  command: which aws
+  register: aws_path
+  tags:
+    - s3copy
+    - webserver
+
+- name: Download AWS cli
+  get_url:
+    url: https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
+    dest: /usr/local/src/awscli-exe-linux-x86_64.zip
+  tags:
+    - s3copy
+    - webserver
+
+- name: Unarchive AWS cli
+  unarchive:
+    remote_src: yes
+    src: /usr/local/src/awscli-exe-linux-x86_64.zip
+    dest: /usr/local/src/
+  when: not ansible_check_mode
+  tags:
+    - s3copy
+    - webserver
+
+- name: Install AWS cli
+  command:
+    chdir: /usr/local/src/
+    cmd: ./aws/install
+  when:
+    - aws_path is defined and aws_path.stdout == ""
+    - not ansible_check_mode
+  tags:
+    - s3copy
+    - webserver
+
+- name: Update AWS cli
+  command:
+    chdir: /usr/local/src/
+    cmd: ./aws/install
+  when:
+    - aws_path is defined and aws_path.stdout == "aws"
+    - not ansible_check_mode
+  tags:
+    - s3copy
+    - webserver
+
+- name: Create and setup AWS credentials
+  include: aws_credentials.yml
+  with_items: "{{ aws.credentials }}"
+  loop_control:
+    loop_var: credential
+  tags:
+    - s3copy
+    - webserver
+
+- name: Copy s3 backup services
+  template:
+    src: "{{ item }}"
+    dest: "/etc/systemd/system/{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - s3copy.service
+    - s3copy.timer
+  tags:
+    - s3copy
+    - webserver
