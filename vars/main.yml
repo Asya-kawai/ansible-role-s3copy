@@ -5,3 +5,5 @@ s3copy_service_name: s3copy.service
 s3copy_timer_name: s3copy.timer
 s3copy_service_path: "{{ s3copy_service_dir.rstrip('/') }}/{{ s3copy_service_name }}"
 s3copy_timer_path: "{{ s3copy_timer_dir.rstrip('/') }}/{{ s3copy_timer_name }}"
+
+awscli_install_path: /usr/local/bin/aws

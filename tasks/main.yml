@@ -67,10 +67,9 @@
     - webserver
 
 - name: Check AWS cli exists
-  command: which aws
+  stat:
+    path: "{{ awscli_install_path }}"
   register: awscli_path
-  ignore_errors: yes
-  changed_when: false
   tags:
     - s3copy
     - s3copy-check-awscli-exists
@@ -81,8 +80,7 @@
     chdir: /usr/local/src/
     cmd: ./aws/install
   when:
-    - awscli_path is defined
-    - awscli_path.stdout | length == 0
+    - not awscli_path.stat.exists
   changed_when: false
   tags:
     - s3copy
@@ -94,8 +92,7 @@
     chdir: /usr/local/src/
     cmd: ./aws/install --update
   when:
-    - awscli_path is defined
-    - awscli_path.stdout | length > 0
+    - awscli_path.stat.exists
   changed_when: false
   tags:
     - s3copy
