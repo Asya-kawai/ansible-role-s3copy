@@ -1,5 +1,7 @@
 # Ansible Role For Copy backup files to AWS S3.
 
+[![CI](https://github.com/Asya-kawai/ansible-role-s3copy/actions/workflows/ci.yml/badge.svg)](https://github.com/Asya-kawai/ansible-role-s3copy/actions/workflows?query=workflow%3ACI)
+
 Setup AWS credentials and s3 copy settings.
 
 This role copies backup files(.tar.gz only) in `/var/` to AWS S3.
