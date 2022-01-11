@@ -1,0 +1,12 @@
+[Unit]
+Description=The backup script to copy tar.gz files to AWS S3
+Wants={{ s3copy_timer_name }}
+
+[Service]
+Type=oneshot
+User={{ s3copy_user }}
+Group={{ s3copy_group }}
+ExecStart=bash -c "cd /var/ && aws s3 cp backup {{ s3copy_dest }} --recursive --include '*.tar.gz'"
+
+[Install]
+WantedBy=multi-user.target

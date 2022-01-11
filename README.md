@@ -74,11 +74,10 @@ aws:
         aws_access_key_id = AKIAIOSFODNN7EXAMPLE
         aws_secret_access_key = wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 
-s3copy:
-  user: root
-  group: root
-  on_calender: '*-*-* 00:00:00'
-  dest: s3://backup
+s3copy_user: root
+s3copy_group: root
+s3copy_on_calender: '*-*-* 00:00:00'
+s3copy_dest: s3://backup
 ```
 
 Of course, you can define it as a general setting in `all.yml`.
@@ -100,11 +99,10 @@ aws:
         aws_access_key_id = AKIAIOSFODNN7EXAMPLE
         aws_secret_access_key = wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 
-s3copy:
-  user: root
-  group: root
-  on_calender: '*-*-* 00:00:00'
-  dest: s3://backup
+s3copy_user: root
+s3copy_group: root
+s3copy_on_calender: '*-*-* 00:00:00'
+s3copy_dest: s3://backup
 ```
 
 ## Playbook / Webservers(webservers.yml)

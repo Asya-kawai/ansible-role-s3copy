@@ -1,9 +1,11 @@
+---
 - name: Update OS package caches for Debian
   apt:
     update_cache: yes
   when: ansible_facts['os_family'] == 'Debian'
   tags:
     - s3copy
+    - s3copy-update-os-package-caches
     - webserver
 
 - name: Update OS package caches for CentOS
@@ -12,6 +14,7 @@
   when: ansible_facts['os_family'] == 'RedHat'
   tags:
     - s3copy
+    - s3copy-update-os-package-caches
     - webserver
 
 - name: Update OS packages
@@ -20,6 +23,7 @@
     state: latest
   tags:
     - s3copy
+    - s3copy-update-os-packages
     - webserver
 
 - name: Install OS packages
@@ -30,13 +34,7 @@
     state: present
   tags:
     - s3copy
-    - webserver
-
-- name: Check AWS cli exists
-  command: which aws
-  register: aws_path
-  tags:
-    - s3copy
+    - s3copy-install-os-packages
     - webserver
 
 - name: Download AWS cli
@@ -45,6 +43,16 @@
     dest: /usr/local/src/awscli-exe-linux-x86_64.zip
   tags:
     - s3copy
+    - s3copy-download-awscli
+    - webserver
+
+- name: Check AWS cli zip exists
+  stat:
+    path: /usr/local/src/awscli-exe-linux-x86_64.zip
+  register: awscli_zip_path
+  tags:
+    - s3copy
+    - s3copy-check-awscli-zip-exists
     - webserver
 
 - name: Unarchive AWS cli
@@ -52,9 +60,20 @@
     remote_src: yes
     src: /usr/local/src/awscli-exe-linux-x86_64.zip
     dest: /usr/local/src/
-  when: not ansible_check_mode
+  when: awscli_zip_path.stat.exists
   tags:
     - s3copy
+    - s3copy-unarchive-awscli
+    - webserver
+
+- name: Check AWS cli exists
+  command: which aws
+  register: awscli_path
+  ignore_errors: yes
+  changed_when: false
+  tags:
+    - s3copy
+    - s3copy-check-awscli-exists
     - webserver
 
 - name: Install AWS cli
@@ -62,21 +81,25 @@
     chdir: /usr/local/src/
     cmd: ./aws/install
   when:
-    - aws_path is defined and aws_path.stdout == ""
-    - not ansible_check_mode
+    - awscli_path is defined
+    - awscli_path.stdout | length == 0
+  changed_when: false
   tags:
     - s3copy
+    - s3copy-install-awscli
     - webserver
 
 - name: Update AWS cli
   command:
     chdir: /usr/local/src/
-    cmd: ./aws/install
+    cmd: ./aws/install --update
   when:
-    - aws_path is defined and aws_path.stdout == "aws"
-    - not ansible_check_mode
+    - awscli_path is defined
+    - awscli_path.stdout | length > 0
+  changed_when: false
   tags:
     - s3copy
+    - s3copy-update-awscli
     - webserver
 
 - name: Create and setup AWS credentials
@@ -86,18 +109,20 @@
     loop_var: credential
   tags:
     - s3copy
+    - s3copy-create-aws-credentials
     - webserver
 
-- name: Create s3 backup services
+- name: Create s3copy services
   template:
-    src: "{{ item }}.j2"
-    dest: "/etc/systemd/system/{{ item }}"
+    src: "{{ item.lstrip('/') }}.j2"
+    dest: "{{ item }}"
     owner: root
     group: root
     mode: 0644
   with_items:
-    - s3copy.service
-    - s3copy.timer
+    - "{{ s3copy_service_path }}"
+    - "{{ s3copy_timer_path }}"
   tags:
     - s3copy
+    - s3copy-create-s3copy-services
     - webserver
