@@ -6,7 +6,7 @@ Wants={{ s3copy_timer_name }}
 Type=oneshot
 User={{ s3copy_user }}
 Group={{ s3copy_group }}
-ExecStart=bash -c "cd /var/ && aws s3 cp backup {{ s3copy_dest }} --recursive --include '*.tar.gz'"
+ExecStart=bash -c "cd /var/ && /usr/local/bin/aws s3 cp backup {{ s3copy_dest }} --recursive --include '*.tar.gz'"
 
 [Install]
 WantedBy=multi-user.target
