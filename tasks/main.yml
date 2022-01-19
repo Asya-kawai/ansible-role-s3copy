@@ -124,6 +124,26 @@
     - s3copy-create-s3copy-services
     - webserver
 
+- name: Check s3copy service exists
+  stat:
+    path: "{{ s3copy_service_path }}"
+  register: s3copy_service_path_result
+  tags:
+    - s3copy
+    - s3copy-check-s3copy-service
+    - webserver
+
+- name: Enable s3copy service
+  systemd:
+    name: "{{ s3copy_service_name }}"
+    enabled: true
+    daemon-reload: true
+  when: s3copy_service_path_result.stat.exists
+  tags:
+    - s3copy
+    - s3copy-enable-s3copy-services
+    - webserver
+
 - name: Check s3copy timer exists
   stat:
     path: "{{ s3copy_timer_path }}"
