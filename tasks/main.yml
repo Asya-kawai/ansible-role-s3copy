@@ -141,7 +141,7 @@
   when: s3copy_service_path_result.stat.exists
   tags:
     - s3copy
-    - s3copy-enable-s3copy-services
+    - s3copy-enable-s3copy-service
     - webserver
 
 - name: Check s3copy timer exists
@@ -162,5 +162,5 @@
   when: s3copy_timer_path_result.stat.exists
   tags:
     - s3copy
-    - s3copy-enable-s3copy-services
+    - s3copy-enable-s3copy-timer
     - webserver
