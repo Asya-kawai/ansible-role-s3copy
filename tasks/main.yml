@@ -41,6 +41,9 @@
   get_url:
     url: https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
     dest: /usr/local/src/awscli-exe-linux-x86_64.zip
+    owner: root
+    group: root
+    mode: 0644
   tags:
     - s3copy
     - s3copy-download-awscli
