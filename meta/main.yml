@@ -20,7 +20,7 @@ galaxy_info:
         - buster
     - name: EL
       versions:
-        - 8
+        - '8'
   galaxy_tags:
     - system
     - web

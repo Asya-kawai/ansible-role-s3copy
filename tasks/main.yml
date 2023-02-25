@@ -103,7 +103,7 @@
     - webserver
 
 - name: Create and setup AWS credentials
-  include: aws_credentials.yml
+  include_tasks: aws_credentials.yml
   with_items: "{{ aws.credentials }}"
   loop_control:
     loop_var: credential
